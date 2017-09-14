@@ -1,0 +1,25 @@
+{
+    "name": "arhone/builder",
+    "description": "Сборщик пакетов - Внедрение зависимостей (PHP)",
+    "homepage": "https://github.com/arhone/builder",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Алексей Арх",
+            "email": "info@arh.one"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "arhone\\builder\\": ""
+        },
+        "classmap": [
+            "Builder.php"
+        ]
+    },
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^7.0"
+    }
+}
