@@ -85,7 +85,7 @@ class Builder {
 
         } else {
 
-            throw new \Exception('DI: Отсутствует настройка для ' . $alias);
+            throw new \Exception('Builder: Отсутствует настройка для ' . $alias);
 
         }
 
@@ -269,7 +269,9 @@ class Builder {
      * @return object
      */
     protected static function makeObject (array $instruction) : object {
+        
         return (object)$instruction['object'];
+        
     }
 
     /**
@@ -279,7 +281,9 @@ class Builder {
      * @return array
      */
     protected static function makeArray (array $instruction) : array {
+        
         return (array)$instruction['array'];
+        
     }
 
     /**
@@ -289,7 +293,9 @@ class Builder {
      * @return string
      */
     protected static function makeString (array $instruction) : string {
+        
         return (string)$instruction['string'];
+        
     }
 
     /**
@@ -299,7 +305,9 @@ class Builder {
      * @return int
      */
     protected static function makeInteger (array $instruction) : int {
+        
         return (integer)$instruction['integer'];
+        
     }
 
     /**
@@ -309,7 +317,9 @@ class Builder {
      * @return float
      */
     protected static function makeFloat (array $instruction) : float {
+        
         return (float)$instruction['float'];
+        
     }
 
     /**
@@ -319,7 +329,9 @@ class Builder {
      * @return mixed
      */
     protected static function makeAlias (array $instruction) {
+        
         return self::get($instruction['alias']);
+        
     }
 
     /**
