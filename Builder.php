@@ -131,7 +131,7 @@ class Builder {
      */
     protected static function getCallback (string $alias) {
 
-        return self::$storage[$alias]->__invoke();
+        return self::$storage[$alias]->__invoke(...self::make(self::$instruction[$alias]['argument'] ?? []));
 
     }
 
@@ -261,14 +261,14 @@ class Builder {
         return $Object;
 
     }
-
+    
     /**
      * Возвращает объект
      *
      * @param array $instruction
      * @return object
      */
-    protected static function makeObject (array $instruction) {
+    protected static function makeObject (array $instruction) : object {
         return (object)$instruction['object'];
     }
 
@@ -278,7 +278,7 @@ class Builder {
      * @param array $instruction
      * @return array
      */
-    protected static function makeArray (array $instruction) {
+    protected static function makeArray (array $instruction) : array {
         return (array)$instruction['array'];
     }
 
@@ -288,7 +288,7 @@ class Builder {
      * @param array $instruction
      * @return string
      */
-    protected static function makeString (array $instruction) {
+    protected static function makeString (array $instruction) : string {
         return (string)$instruction['string'];
     }
 
@@ -298,7 +298,7 @@ class Builder {
      * @param array $instruction
      * @return int
      */
-    protected static function makeInteger (array $instruction) {
+    protected static function makeInteger (array $instruction) : int {
         return (integer)$instruction['integer'];
     }
 
@@ -308,7 +308,7 @@ class Builder {
      * @param array $instruction
      * @return float
      */
-    protected static function makeFloat (array $instruction) {
+    protected static function makeFloat (array $instruction) : float {
         return (float)$instruction['float'];
     }
 
