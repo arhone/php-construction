@@ -15,7 +15,13 @@ class Builder {
      *
      * @var array
      */
-    protected static $config = [];
+    protected static $config = [
+        'cache'    => true,
+        'cacheDir' => __DIR__ . '/../../../cache/builder',
+        'new'      => false,
+        'clone'    => true,
+        'defaultType' => 'alias'
+    ];
 
     /**
      * Инструкции внедрения зависимостей
@@ -195,7 +201,7 @@ class Builder {
         }
 
         $type = 'data';
-        foreach (['class', 'object', 'alias', 'array', 'string', 'integer', 'float'] as $key => $value) {
+        foreach (['class', 'object', 'alias', 'array', 'string', 'integer', 'float', 'bool'] as $key => $value) {
 
             if (isset($instruction[$value])) {
 
@@ -271,7 +277,7 @@ class Builder {
     protected static function makeObject (array $instruction) : object {
         
         return (object)$instruction['object'];
-        
+
     }
 
     /**

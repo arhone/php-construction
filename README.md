@@ -1,5 +1,5 @@
 # Builder Container
-Сборщик - Строитель - Внедрение зависимостей (PHP)
+Сборщик - Строитель - Внедрение зависимостей (PHP 7)
 
 # Описание
 
@@ -11,13 +11,13 @@ Builder собирает объекты по заданным инструкци
 
 В отличае от того же DIC, Builder при сборке пакета может вызывать цепочку методов объекта, передавать зависимости в аргументы этих методов, задавать свойства объекта и т.д.
 
-Builder как и Service Locator можно использовать локально в ваших классах, получаю объект по псевдониму (alias)
+Builder как и Service Locator можно использовать локально в ваших классах, получая объект по псевдониму (alias)
 
 ```php
 <?php
 use arhone\builder\Builder;
 
-Builder::config([
+Builder::instruction([
     'Alias' => [
         'class' => 'ClassNameAlias'
     ]
@@ -31,7 +31,7 @@ $Obj = Builder::get('Alias');
 <?php
 use arhone\builder\Builder;
 
-Builder::config([
+Builder::instruction([
     'Alias' => [
         'class' => 'ClassNameAlias'
     ]
@@ -57,8 +57,30 @@ $Obj = Builder::make([
 
 Создаст объкт класса ClassName, передас в конструктор Alias, создаст и передаст в конструктор ClassName2, передаст в метод ClassName->config($config) массив с настройками $config
 
-Работает с PHP 7 и выше.
+Так же можно запросить класс на прямую:
 
+```php
+<?php
+use arhone\builder\Builder;
+
+$Obj = Builder::get('namespace\ClassName');
+```
+
+В этом случае Builder сам создаст инструкции на основе зависимостей класса.
+Инструкция будет создана для псевдонима "namespace\ClassName", которую вы можете переопределить:
+
+```php
+<?php
+use arhone\builder\Builder;
+
+Builder::instruction([
+    'namespace\ClassName' => [
+        'class' => 'ClassNameAlias'
+    ]
+]);
+
+$Obj = Builder::get('namespace\ClassName');
+```
 # Подключение
 
 1) Загрузите пакет с помощью composer или скачайте с github
@@ -76,19 +98,13 @@ include 'vendor/autoload.php';
 $Builder = new Builder();
 ```
 
-Передать инструкци можно сразу же в конструктор
-
+Передать/дополнить инструкции можно можно с помощью метода "instruction"
 ```php
-$Builder = new Builder(include 'config/boulder/instruction.php');
+$Builder->instruction(include 'config/builder/instruction1.php');
+$Builder->instruction(include 'config/builder/instruction2.php');
 ```
 
-И/или дополнить набор инструкций позже
-```php
-$Builder->config(include 'config/boulder/instruction1.php');
-$Builder->config(include 'config/boulder/instruction2.php');
-```
-
-Подразумевается что config/boulder/instruction.php вернёт массив с инструкциями, вроде тех, что описаны выше:
+Подразумевается что config/builder/instruction.php вернёт массив с инструкциями, вроде тех, что описаны выше:
 ```php
 <?php
 return [
@@ -101,3 +117,168 @@ return [
 ];
 ```
 # Инструкции для сборки
+
+Инструкция строятся по типа Alias => instruction.
+
+По "alias" вы запрашиваете сборку на основе его инструкции.
+
+Builder понимает несколько типов инструкций:
+
+1) class
+
+В инструкции к сборке класса можно указать следующие правила
+
+```php
+<?php
+return [
+    'Alias' => [
+        'require' => 'path/ClassName.php', // Может подключить ваш класс, если у вас нет автозагрузчика под него
+        'class' => 'ClassName', // Класс, который вы хотите собрать
+        'construct' => [
+            ['Alias2'], // Передаст "Alias2" в конструктор класса
+            [
+                'class' => 'ClassName3'
+            ] // Создаст и передаст ClassName3 в конструктор класса
+        ],
+        'property' => [
+            'name1' => 'value',
+            'name2' => 'value'
+        ], // Задаст значения свойствам
+        'method' => [
+            'config' => [
+                [
+                    'array' => $config
+                ]
+            ] // Запустит метод config с переданным массивом $config в качестве аргумента
+        ],
+        'new' => true, // В этом случае Builder будет всегда возвращать новый экземпляр класса
+        'clone' => true // Будет возвращать клонированный экземпляр. clone true/false работает только если new == false
+    ]
+];
+```
+
+2) callback
+
+```php
+<?php
+return [
+    'myFunc' => [
+        'callback' => function ($name) {
+            return 'Привет ' . $name;
+        },
+        'argument' => [
+            [
+                'string' => 'Вася'
+            ]
+        ]
+    ]
+];
+```
+
+В случае с callback типом инструкции, Builder вернёт вам её результат.
+
+С помощью ключа "argument", можно указать набор зависимостей, с которым будет выполнятся функция.
+
+Если вы хотите возвращать функцию, а не результат её выполнения, указывайте тип "callable"
+
+Builder никак не обрабатывает тип "callable", по этому он просто вернёт что есть, по этой же причине вы не можете настроить "argument".
+
+То есть тип "callable" это просто для читабельности, но вы можете его назвать по другому, например "myFunc"
+
+```php
+<?php
+return [
+    'myFunc' => [
+        'callable' => function ($name) {
+            return 'Привет ' . $name;
+        }
+    ]
+];
+```
+
+3) array, object, integer, float, bool
+
+```php
+<?php
+return [
+    'myArray' => [
+        'array' => [1,2,3]
+    ]
+];
+```
+
+По большей части эти типы созданны для наглядности, но Builder будет приводить ваши данные к этим типам
+
+```php
+<?php
+return [
+    'myArray' => [
+        'array' => 'строка'
+    ] // Вернёт массив ['строка']. Равносильно (array)'строка';
+];
+```
+
+Если вам не нужно приведение к типу, укажите свой тип.
+
+Тоесть придумайте любое слово, например добавьте подчёркивание _string или укажите через разделитель.
+
+```php
+<?php
+return [
+    'myArray' => [
+        'array|string' => include 'data.php' // include возвращает return 'строка'; а может быть и return ['массив'];
+    ] // Ваш выдуманный тип. Ещё варианты что бы вы не думали (other, unknown)
+];
+```
+
+4) alias
+
+В качестве инструкции можно передать другую инструкцию
+
+```php
+<?php
+return [
+    'Alias1' => [
+        'class' => 'ClassName'
+    ],
+    'Alias2' => [
+        'alias' => 'Alias1'
+    ],
+    'Alias3' => ['Alias2'] // У типа "alias" есть сокращённая форма. Вы просто не указываете тип, по умолчанию это будет "alias"
+];
+```
+
+5) instruction
+
+```php
+<?php
+return [
+    'Alias' => [
+        'instruction' => include 'vendor/name/Alias/config/builder/instruction.php'
+    ]
+];
+```
+
+Тип "instruction" позволяет ссылаться на инструкции, которые лежат за пределами вашей ответственности.
+
+Например это инструкции библиотеки, которую разрабатываете не вы.
+
+Разработчик библиотеки размещяет инструкции для её сборки, а вы просто их подключаете.
+
+```php
+<?php
+return [
+    'Alias' => include 'vendor/name/Alias/config/builder/instruction.php' // Тоже самое
+];
+```
+
+vendor/name/Alias/config/builder/instruction.php:
+
+```php
+<?php
+return [
+    'class' => 'ClassName'
+];
+```
+
+# Настройка класса Builder
