@@ -237,7 +237,7 @@ return [
 return [
     'myArray' => [
         'array|string' => include 'data.php' // include возвращает return 'строка'; а может быть и return ['массив'];
-    ] // Ваш выдуманный тип. Ещё варианты что бы вы не думали (other, unknown)
+    ] // Ваш выдуманный тип. Ещё варианты что бы вы не думали (data, other, unknown)
 ];
 ```
 
