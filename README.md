@@ -174,6 +174,10 @@ return [
     ]
 ];
 ```
+```php
+<?php
+echo Builder::make('myFunc');
+```
 
 В случае с callback типом инструкции, Builder вернёт вам её результат.
 
