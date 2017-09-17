@@ -196,6 +196,12 @@ return [
 ];
 ```
 
+```php
+<?php
+$myFunc = Builder::make('myFunc');
+echo $myFunc('Вася');
+```
+
 3) array, object, integer, float, bool
 
 ```php
