@@ -60,6 +60,13 @@ class Builder {
             $instruction = isset(self::$instruction[$instruction]) ? ['alias' => $instruction] : ['reflection' => $instruction];
         }
 
+        $type = key($instruction);
+        if (!$type) {
+            return self::makeAlias([
+                'alias' => current($instruction)
+            ]);
+        }
+
         $type = 'data';
         foreach (['class', 'reflection', 'object', 'alias', 'callback', 'array', 'string', 'integer', 'float', 'bool', 'instruction'] as $key => $value) {
             if (isset($instruction[$value])) {
@@ -164,13 +171,25 @@ class Builder {
      * Возвращает объект
      *
      * @param array $instruction
+     * @param null $alias
      * @return object
      */
-    protected static function makeObject (array $instruction) : object {
+    protected static function makeObject (array $instruction, $alias = null) {
 
-        return !empty(self::$instruction['clone'])
-            ? clone ((object)$instruction['object'])
-            : $instruction['object'];
+        if (isset(self::$storage[$alias])) {
+
+            $obj = ($instruction['clone'] ?? self::$config['clone']) ? clone self::$storage[$alias] : self::$storage[$alias];
+
+        } else {
+
+            $obj = (object)$instruction['object'];
+            if (($instruction['clone'] ?? self::$config['clone']) && $alias) {
+                self::$storage[$alias] = $obj;
+            }
+
+        }
+
+        return $obj;
 
     }
 
@@ -242,8 +261,15 @@ class Builder {
      */
     protected static function makeAlias (array $instruction) {
 
-        $instruction = self::$instruction[$instruction['alias']];
-        return isset($instruction['class']) ? self::makeClass($instruction, $instruction['class']) : self::make($instruction);
+        $alias = $instruction['alias'];
+        $instruction = self::$instruction[$alias];
+        if (isset($instruction['class'])) {
+            return self::makeClass($instruction, $alias);
+        } elseif (isset($instruction['object'])) {
+            return self::makeObject($instruction, $alias);
+        } else {
+            return self::make($instruction);
+        }
 
     }
 
