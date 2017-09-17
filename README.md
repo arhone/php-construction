@@ -23,7 +23,7 @@ Builder::instruction([
     ]
 ]);
 
-$Obj = Builder::get('Alias');
+$Obj = Builder::make('Alias');
 ```
 или собирать по инструкции
 
@@ -63,7 +63,7 @@ $Obj = Builder::make([
 <?php
 use arhone\builder\Builder;
 
-$Obj = Builder::get('namespace\ClassName');
+$Obj = Builder::make('namespace\ClassName');
 ```
 
 В этом случае Builder сам создаст инструкции на основе зависимостей класса.
@@ -79,7 +79,7 @@ Builder::instruction([
     ]
 ]);
 
-$Obj = Builder::get('namespace\ClassName');
+$Obj = Builder::make('namespace\ClassName');
 ```
 # Подключение
 

@@ -49,121 +49,26 @@ class Builder {
     }
 
     /**
-     * Добавляет объект в хранилище
+     * Возвращает результат сборки
      *
-     * @param string $name
-     * @param $data
-     */
-    public static function set (string $name, $data) {
-
-        self::$storage[$name] = $data;
-
-    }
-
-    /**
-     * Получение объекта
-     *
-     * @param string $alias
+     * @param array $instruction
      * @return mixed
-     * @throws \Exception
      */
-    public static function get (string $alias) {
+    public static function make ($instruction) {
 
-        if (!isset(self::$storage[$alias]) && isset(self::$instruction[$alias])) {
-
-            self::$storage[$alias] = self::make(self::$instruction[$alias]);
-
+        if (is_string($instruction)) {
+            $instruction = isset(self::$instruction[$instruction]) ? ['alias' => $instruction] : ['reflection' => $instruction];
         }
 
-        if (isset(self::$storage[$alias])) {
-
-            $type = 'data';
-            foreach (['class', 'callback', 'object'] as $key => $value) {
-
-                if (isset(self::$instruction[$alias][$value])) {
-
-                    $type = $value; break;
-
-                }
-
+        $type = 'data';
+        foreach (['class', 'reflection', 'object', 'alias', 'callback', 'array', 'string', 'integer', 'float', 'bool', 'instruction'] as $key => $value) {
+            if (isset($instruction[$value])) {
+                $type = $value; break;
             }
-
-            $method = 'get' . ucfirst($type);
-            return self::$method($alias);
-
-        } else {
-
-            throw new \Exception('Builder: Отсутствует настройка для ' . $alias);
-
         }
 
-    }
-
-    /**
-     * Возвращает класс
-     *
-     * @param $alias
-     * @return object
-     * @throws \Exception
-     */
-    protected static function getClass (string $alias) {
-
-        return self::$instruction[$alias]['new'] ?? self::$config['new']
-            ? self::make(self::$instruction[$alias])
-            : self::$instruction[$alias]['clone'] ?? self::$config['clone']
-                ? clone self::$storage[$alias]
-                : self::$storage[$alias];
-
-    }
-
-    /**
-     * Возвращает значение превдонима
-     *
-     * @param $alias
-     * @return mixed
-     * @throws \Exception
-     */
-    protected static function getAlias (string $alias) {
-
-        return self::get($alias);
-
-    }
-
-    /**
-     * Возвращает результат вызова функции
-     *
-     * @param string $alias
-     * @return mixed
-     */
-    protected static function getCallback (string $alias) {
-
-        return self::$instruction[$alias]['callback']->__invoke(...self::makeAll(self::$instruction[$alias]['argument'] ?? []));
-
-    }
-
-    /**
-     * Возвращает объект
-     *
-     * @param string $alias
-     * @return object
-     */
-    protected static function getObject (string $alias) : object {
-
-        return !empty(self::$instruction[$alias]['clone'])
-            ? clone self::$storage[$alias]
-            : self::$storage[$alias];
-
-    }
-
-    /**
-     * Возвращает значение
-     *
-     * @param string $alias
-     * @return mixed
-     */
-    protected static function getData (string $alias) {
-
-        return self::$storage[$alias];
+        $method = 'make' . ucfirst($type);
+        return self::$method($instruction);
 
     }
 
@@ -186,82 +91,68 @@ class Builder {
     }
 
     /**
-     * Возвращает результат сборки
-     *
-     * @param array $instruction
-     * @return mixed
-     */
-    public static function make (array $instruction) {
-
-        $type = key($instruction);
-        if (!$type) {
-            return self::makeAlias([
-                'alias' => current($instruction)
-            ]);
-        }
-
-        $type = 'data';
-        foreach (['class', 'object', 'alias', 'callback', 'array', 'string', 'integer', 'float', 'bool', 'instruction'] as $key => $value) {
-
-            if (isset($instruction[$value])) {
-
-                $type = $value; break;
-
-            }
-
-        }
-
-        $method = 'make' . ucfirst($type);
-        return self::$method($instruction);
-
-    }
-
-    /**
      * Создаёт и возвращает готовый экземпляр класса
      *
      * @param array $instruction
+     * @param null $alias
      * @return mixed
      * @throws \Exception
      */
-    protected static function makeClass (array $instruction) {
+    protected static function makeClass (array $instruction, $alias = null) {
 
-        if (isset($instruction['require'])) {
+        if (($instruction['new'] ?? self::$config['new']) || !isset(self::$storage[$alias])) {
 
-            if (file_exists($instruction['require'])) {
+            if (isset($instruction['require'])) {
 
-                $require = function ($require) {
-                    require_once $require;
-                };
-                $require($instruction['require']);
+                if (file_exists($instruction['require'])) {
 
-            } else {
+                    $require = function ($require) {
+                        require_once $require;
+                    };
+                    $require($instruction['require']);
 
-                throw new \Exception('DI: Отсутствует файл ' . $instruction['require']);
+                } else {
 
-            }
+                    throw new \Exception('Builder: Отсутствует файл ' . $instruction['require']);
 
-        }
-
-        $instruction['class'] = '\\' . $instruction['class'];
-        $Object = new $instruction['class'](...self::makeAll($instruction['construct'] ?? []));
-
-        if (isset($instruction['property'])) {
-
-            foreach ($instruction['property'] as $property => $pInstruction) {
-
-                $Object->{$property} = self::make($pInstruction);
+                }
 
             }
 
-        }
+            $instruction['class'] = '\\' . $instruction['class'];
+            $Object = new $instruction['class'](...self::makeAll($instruction['construct'] ?? []));
 
-        if (isset($instruction['method'])) {
+            if (isset($instruction['property'])) {
 
-            foreach ($instruction['method'] as $method => $mInstruction) {
+                foreach ($instruction['property'] as $property => $pInstruction) {
 
-                $Object->$method(...self::makeAll($mInstruction ?? []));
+                    $Object->{$property} = self::make($pInstruction);
+
+                }
 
             }
+
+            if (isset($instruction['method'])) {
+
+                foreach ($instruction['method'] as $method => $mInstruction) {
+
+                    $Object->$method(...self::makeAll($mInstruction ?? []));
+
+                }
+
+            }
+
+            if (!($instruction['new'] ?? self::$config['new']) && $alias) {
+                self::$storage[$alias] = $Object;
+            }
+
+        } elseif ($instruction['clone'] ?? self::$config['clone']) {
+
+            $Object = clone self::$storage[$alias];
+
+        } else {
+
+            $Object = self::$storage[$alias];
 
         }
 
@@ -277,7 +168,9 @@ class Builder {
      */
     protected static function makeObject (array $instruction) : object {
 
-        return (object)$instruction['object'];
+        return !empty(self::$instruction['clone'])
+            ? clone ((object)$instruction['object'])
+            : $instruction['object'];
 
     }
 
@@ -349,7 +242,8 @@ class Builder {
      */
     protected static function makeAlias (array $instruction) {
 
-        return self::get($instruction['alias']);
+        $instruction = self::$instruction[$instruction['alias']];
+        return isset($instruction['class']) ? self::makeClass($instruction, $instruction['class']) : self::make($instruction);
 
     }
 
@@ -375,6 +269,16 @@ class Builder {
 
         return self::make($instruction['instruction']);
 
+    }
+
+    /**
+     * Создаёт объект с помощью рефлексис
+     *
+     * @param array $instruction
+     * @throws \Exception
+     */
+    protected static function makeReflection (array $instruction) {
+        throw new \Exception('В разработке ' . PHP_EOL . var_export($instruction, true));
     }
 
     /**
