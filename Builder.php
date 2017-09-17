@@ -265,8 +265,6 @@ class Builder {
         $instruction = self::$instruction[$alias];
         if (isset($instruction['class'])) {
             return self::makeClass($instruction, $alias);
-        } elseif (isset($instruction['object'])) {
-            return self::makeObject($instruction, $alias);
         } else {
             return self::make($instruction);
         }
