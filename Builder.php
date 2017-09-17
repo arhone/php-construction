@@ -39,10 +39,12 @@ class Builder {
 
     /**
      * Builder constructor.
+     *
+     * @param array $config
      */
-    public function __construct () {
+    public function __construct (array $config = []) {
 
-        $this->set('DI', $this);
+        self::config($config);
 
     }
 
@@ -76,7 +78,7 @@ class Builder {
         if (isset(self::$storage[$alias])) {
 
             $type = 'data';
-            foreach (['class', 'callback', 'object', 'alias'] as $key => $value) {
+            foreach (['class', 'callback', 'object'] as $key => $value) {
 
                 if (isset(self::$instruction[$alias][$value])) {
 
@@ -104,15 +106,13 @@ class Builder {
      * @return object
      * @throws \Exception
      */
-    protected static function getClass (string $alias) : object {
+    protected static function getClass (string $alias) {
 
-        return !empty(self::$instruction[$alias]['new'])
+        return self::$instruction[$alias]['new'] ?? self::$config['new']
             ? self::make(self::$instruction[$alias])
-            : (
-            !empty(self::$instruction[$alias]['clone'])
+            : self::$instruction[$alias]['clone'] ?? self::$config['clone']
                 ? clone self::$storage[$alias]
-                : self::$storage[$alias]
-            );
+                : self::$storage[$alias];
 
     }
 
@@ -137,7 +137,7 @@ class Builder {
      */
     protected static function getCallback (string $alias) {
 
-        return self::$storage[$alias]->__invoke(...self::make(self::$instruction[$alias]['argument'] ?? []));
+        return self::$instruction[$alias]['callback']->__invoke(...self::makeAll(self::$instruction[$alias]['argument'] ?? []));
 
     }
 
@@ -201,7 +201,7 @@ class Builder {
         }
 
         $type = 'data';
-        foreach (['class', 'object', 'alias', 'array', 'string', 'integer', 'float', 'bool'] as $key => $value) {
+        foreach (['class', 'object', 'alias', 'callback', 'array', 'string', 'integer', 'float', 'bool', 'instruction'] as $key => $value) {
 
             if (isset($instruction[$value])) {
 
@@ -242,6 +242,7 @@ class Builder {
 
         }
 
+        $instruction['class'] = '\\' . $instruction['class'];
         $Object = new $instruction['class'](...self::makeAll($instruction['construct'] ?? []));
 
         if (isset($instruction['property'])) {
@@ -267,7 +268,7 @@ class Builder {
         return $Object;
 
     }
-    
+
     /**
      * Возвращает объект
      *
@@ -275,8 +276,20 @@ class Builder {
      * @return object
      */
     protected static function makeObject (array $instruction) : object {
-        
+
         return (object)$instruction['object'];
+
+    }
+
+    /**
+     * Возвращает результат функции
+     *
+     * @param array $instruction
+     * @return mixed
+     */
+    protected static function makeCallback (array $instruction) {
+
+        return $instruction['callback']->__invoke(...self::makeAll($instruction['argument'] ?? []));
 
     }
 
@@ -287,9 +300,9 @@ class Builder {
      * @return array
      */
     protected static function makeArray (array $instruction) : array {
-        
+
         return (array)$instruction['array'];
-        
+
     }
 
     /**
@@ -299,9 +312,9 @@ class Builder {
      * @return string
      */
     protected static function makeString (array $instruction) : string {
-        
+
         return (string)$instruction['string'];
-        
+
     }
 
     /**
@@ -311,9 +324,9 @@ class Builder {
      * @return int
      */
     protected static function makeInteger (array $instruction) : int {
-        
+
         return (integer)$instruction['integer'];
-        
+
     }
 
     /**
@@ -323,9 +336,9 @@ class Builder {
      * @return float
      */
     protected static function makeFloat (array $instruction) : float {
-        
+
         return (float)$instruction['float'];
-        
+
     }
 
     /**
@@ -335,9 +348,9 @@ class Builder {
      * @return mixed
      */
     protected static function makeAlias (array $instruction) {
-        
+
         return self::get($instruction['alias']);
-        
+
     }
 
     /**
@@ -347,7 +360,21 @@ class Builder {
      * @return mixed
      */
     protected static function makeData (array $instruction) {
+
         return current($instruction);
+
+    }
+
+    /**
+     * Собирает по инструкции
+     *
+     * @param array $instruction
+     * @return mixed
+     */
+    protected static function makeInstruction (array $instruction) {
+
+        return self::make($instruction['instruction']);
+
     }
 
     /**
