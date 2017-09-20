@@ -16,11 +16,8 @@ class Builder {
      * @var array
      */
     protected static $config = [
-        'cache'    => true,
-        'cacheDir' => __DIR__ . '/../../../cache/builder',
         'new'      => false,
-        'clone'    => true,
-        'defaultType' => 'alias'
+        'clone'    => true
     ];
 
     /**
