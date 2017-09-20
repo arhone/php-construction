@@ -302,7 +302,9 @@ class Builder {
      * @throws \Exception
      */
     protected static function makeReflection (array $instruction) {
-        throw new \Exception('В разработке ' . PHP_EOL . var_export($instruction, true));
+
+        throw new \Exception('Builder: Настройка для  ' . $instruction['reflection'] . ' не найдена' . PHP_EOL . var_export($instruction, true));
+
     }
 
     /**
