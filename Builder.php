@@ -16,8 +16,8 @@ class Builder {
      * @var array
      */
     protected static $config = [
-        'new'      => false,
-        'clone'    => true
+        'new'   => false,
+        'clone' => true
     ];
 
     /**
@@ -33,6 +33,11 @@ class Builder {
      * @var array
      */
     protected static $storage = [];
+
+    /**
+     * @var
+     */
+    protected static $log;
 
     /**
      * Builder constructor.
@@ -54,7 +59,7 @@ class Builder {
     public static function make ($instruction) {
 
         if (is_string($instruction)) {
-            $instruction = isset(self::$instruction[$instruction]) ? ['alias' => $instruction] : ['reflection' => $instruction];
+            $instruction = isset(self::$instruction[$instruction]) ? ['alias' => $instruction] : ['error' => $instruction];
         }
 
         $type = key($instruction);
@@ -65,7 +70,7 @@ class Builder {
         }
 
         $type = 'data';
-        foreach (['class', 'reflection', 'object', 'alias', 'callback', 'array', 'string', 'integer', 'float', 'bool', 'instruction'] as $key => $value) {
+        foreach (['class', 'error', 'object', 'alias', 'callback', 'array', 'string', 'integer', 'float', 'bool', 'instruction'] as $key => $value) {
             if (isset($instruction[$value])) {
                 $type = $value; break;
             }
@@ -123,6 +128,7 @@ class Builder {
 
             }
 
+            self::$log = self::$log . PHP_EOL . 'new ' . $instruction['class'] . '(...)'; 
             $instruction['class'] = '\\' . $instruction['class'];
             $Object = new $instruction['class'](...self::makeAll($instruction['construct'] ?? []));
 
@@ -293,14 +299,14 @@ class Builder {
     }
 
     /**
-     * Создаёт объект с помощью рефлексис
+     * Выводит ошибку
      *
      * @param array $instruction
      * @throws \Exception
      */
-    protected static function makeReflection (array $instruction) {
+    protected static function makeError (array $instruction) {
 
-        throw new \Exception('Builder: Настройка для  ' . $instruction['reflection'] . ' не найдена' . PHP_EOL . var_export($instruction, true));
+        throw new \Exception('Builder: Настройка для  ' . $instruction['error'] . ' не найдена' . PHP_EOL . var_export($instruction, true) . PHP_EOL . self::$log);
 
     }
 

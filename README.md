@@ -57,30 +57,6 @@ $Obj = Builder::make([
 
 Создаст объкт класса ClassName, передас в конструктор Alias, создаст и передаст в конструктор ClassName2, передаст в метод ClassName->config($config) массив с настройками $config
 
-В следующих версиях можно будет запросить класс на прямую:
-
-```php
-<?php
-use arhone\builder\Builder;
-
-$Obj = Builder::make('namespace\ClassName');
-```
-
-В этом случае Builder сам создаст инструкции на основе зависимостей класса.
-Инструкция будет создана для псевдонима "namespace\ClassName", которую вы можете переопределить:
-
-```php
-<?php
-use arhone\builder\Builder;
-
-Builder::instruction([
-    'namespace\ClassName' => [
-        'class' => 'ClassNameAlias'
-    ]
-]);
-
-$Obj = Builder::make('namespace\ClassName');
-```
 # Подключение
 
 1) Загрузите пакет с помощью composer или скачайте с github
