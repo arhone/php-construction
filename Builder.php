@@ -1,5 +1,4 @@
 <?php declare(strict_types = 1);
-
 namespace arhone\builder;
 
 /**
@@ -8,7 +7,7 @@ namespace arhone\builder;
  * Class Builder
  * @package arhone\builder
  */
-class Builder {
+class Builder implements BuilderInterface {
 
     /**
      * Конфигурация класса
