@@ -18,24 +18,46 @@ Builder как и Service Locator можно использовать локал
 <?php
 use arhone\builder\Builder;
 
-Builder::instruction([
+class Alias {
+
+    public function get () {
+
+        return 'test';
+
+    }
+
+}
+
+$Builder = new Builder();
+
+$Builder->instruction([
+    'Alias' => [
+        'class' => 'Alias'
+    ]
+]);
+
+/**
+ * @var $Alias \Alias
+ */
+$Alias = $Builder->make('Alias');
+echo $Alias->get();
+```
+
+или собирать по инструкции
+
+```php
+<?php
+use arhone\builder\Builder;
+
+$Builder = new Builder();
+
+$Builder->instruction([
     'Alias' => [
         'class' => 'ClassNameAlias'
     ]
 ]);
 
-$Obj = Builder::make('Alias');
-```
-или собирать по инструкции
-```php
-<?php
-use arhone\builder\Builder;
-Builder::instruction([
-    'Alias' => [
-        'class' => 'ClassNameAlias'
-    ]
-]);
-$Obj = Builder::make([
+$Obj = $Builder->make([
     'class' => 'ClassName',
     'construct' => [
         ['Alias'],
@@ -63,7 +85,9 @@ $Obj = Builder::make([
 ```php
 <?php
 use arhone\builder\Builder;
+
 include 'vendor/autoload.php';
+
 $Builder = new Builder();
 ```
 Передать/дополнить инструкции можно с помощью метода "instruction"
@@ -144,7 +168,7 @@ return [
 
 ```php
 <?php
-echo Builder::make('myFunc');
+echo $Builder->make('myFunc');
 ```
 
 В случае с callback типом инструкции, Builder вернёт вам её результат.
@@ -166,7 +190,7 @@ return [
 
 ```php
 <?php
-$myFunc = Builder::make('myFunc');
+$myFunc = $Builder->make('myFunc');
 echo $myFunc('Вася');
 ```
 

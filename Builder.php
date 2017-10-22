@@ -34,6 +34,8 @@ class Builder implements BuilderInterface {
     protected static $storage = [];
 
     /**
+     * Лог сборки
+     * 
      * @var
      */
     protected static $log;
