@@ -30,7 +30,7 @@ interface BuilderInterface {
      * @param string $name
      * @return bool
      */
-    public static function has (string $name);
+    public static function has (string $name) : bool;
 
     /**
      * Дополняет набор правил для удовлетворения зависимостей
@@ -38,7 +38,7 @@ interface BuilderInterface {
      * @param array $instruction
      * @return array
      */
-    public static function instruction (array $instruction);
+    public static function instruction (array $instruction) : array;
 
     /**
      * Метод для установки настроек класса
@@ -46,6 +46,6 @@ interface BuilderInterface {
      * @param array $config
      * @return array
      */
-    public static function config (array $config);
+    public static function config (array $config) : array;
 
 }
