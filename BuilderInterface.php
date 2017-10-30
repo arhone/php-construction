@@ -17,6 +17,14 @@ interface BuilderInterface {
     public function __construct (array $config = []);
 
     /**
+     * Устанавливает значение для Alias
+     *
+     * @param string $alias
+     * @param $value
+     */
+    public function set (string $alias, $value);
+
+    /**
      * Возвращает результат сборки
      *
      * @param array $instruction
