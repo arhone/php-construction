@@ -274,8 +274,13 @@ class Builder implements BuilderInterface {
      *
      * @param array $instruction
      * @return mixed
+     * @throws \Exception
      */
     protected static function makeAlias (array $instruction) {
+
+        if (!isset(self::$instruction[$instruction['alias']])) {
+            throw new \Exception('Builder: Настройка для alias ' . $instruction['alias'] . ' не найдена' . PHP_EOL . var_export($instruction, true) . PHP_EOL . self::$log);
+        }
 
         $alias = $instruction['alias'];
         $instruction = self::$instruction[$alias];
