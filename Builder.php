@@ -36,9 +36,9 @@ class Builder implements BuilderInterface {
     /**
      * Лог сборки
      * 
-     * @var
+     * @var array
      */
-    protected static $log;
+    protected static $log = [];
 
     /**
      * Builder constructor.
@@ -141,7 +141,7 @@ class Builder implements BuilderInterface {
 
             }
 
-            self::$log = self::$log . PHP_EOL . 'new ' . $instruction['class'] . '(...)'; 
+            self::$log[] = PHP_EOL . 'new ' . var_export($instruction, true) . '(...)';
             $instruction['class'] = '\\' . $instruction['class'];
             $Object = new $instruction['class'](...self::makeAll($instruction['construct'] ?? []));
 
@@ -324,7 +324,7 @@ class Builder implements BuilderInterface {
      */
     protected static function makeError (array $instruction) {
 
-        throw new \Exception('Builder: Настройка для  ' . $instruction['error'] . ' не найдена' . PHP_EOL . var_export($instruction, true) . PHP_EOL . self::$log);
+        throw new \Exception('Builder: Настройка для  ' . $instruction['error'] . ' не найдена' . PHP_EOL . var_export($instruction, true) . PHP_EOL . var_export(self::$log, true));
 
     }
 
