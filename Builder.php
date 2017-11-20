@@ -83,7 +83,7 @@ class Builder implements BuilderInterface {
         }
 
         $type = 'data';
-        foreach (['class', 'error', 'object', 'alias', 'callback', 'array', 'string', 'integer', 'float', 'bool', 'instruction'] as $key => $value) {
+        foreach (['class', 'error', 'object', 'alias', 'callback', 'array', 'string', 'integer', 'float', 'bool', 'include', 'instruction'] as $key => $value) {
             if (isset($instruction[$value])) {
                 $type = $value; break;
             }
@@ -159,7 +159,15 @@ class Builder implements BuilderInterface {
 
                 foreach ($instruction['method'] as $method => $mInstruction) {
 
-                    $Object->$method(...self::makeAll($mInstruction ?? []));
+                    if (!empty($mInstruction['chain'])) {
+
+                        $Object = $Object->$method(...self::makeAll($mInstruction['argument'] ?? []));
+
+                    } else {
+
+                        $Object->$method(...self::makeAll($mInstruction['argument'] ?? []));
+
+                    }
 
                 }
 
@@ -301,6 +309,18 @@ class Builder implements BuilderInterface {
     protected static function makeData (array $instruction) {
 
         return current($instruction);
+
+    }
+
+    /**
+     * Возвращает значение исполняемого файла
+     *
+     * @param array $instruction
+     * @return mixed
+     */
+    protected static function makeInclude (array $instruction) {
+
+        return is_file($instruction['include']) ? include $instruction['include'] : null;
 
     }
 
