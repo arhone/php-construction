@@ -68,6 +68,7 @@ class Builder implements BuilderInterface {
      *
      * @param array $instruction
      * @return mixed
+     * @throws \Exception
      */
     public static function make ($instruction) {
 
@@ -222,6 +223,7 @@ class Builder implements BuilderInterface {
      *
      * @param array $instruction
      * @return mixed
+     * @throws \Exception
      */
     protected static function makeCallback (array $instruction) {
 
