@@ -6,6 +6,7 @@ namespace arhone\builder;
  *
  * Interface BuilderInterface
  * @package arhone\builder
+ * @author Aleksey Arh <info@arh.one>
  */
 interface BuilderInterface {
 
