@@ -53,18 +53,6 @@ class Builder implements BuilderInterface {
     }
 
     /**
-     * Устанавливает значение для Alias
-     *
-     * @param string $alias
-     * @param $value
-     */
-    public function set (string $alias, $value) {
-
-        self::$storage[$alias] = $value;
-
-    }
-
-    /**
      * Возвращает результат сборки
      *
      * @param array $instruction
