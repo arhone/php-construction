@@ -13,11 +13,7 @@
     "autoload": {
         "psr-4": {
             "arhone\\builder\\": "source/"
-        },
-        "classmap": [
-            "BuilderInterface.php",
-            "Builder.php"
-        ]
+        }
     },
     "minimum-stability": "dev",
     "require": {
