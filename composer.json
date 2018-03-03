@@ -12,7 +12,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "arhone\\builder\\": ""
+            "arhone\\builder\\": "source/"
         },
         "classmap": [
             "BuilderInterface.php",
