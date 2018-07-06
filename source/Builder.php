@@ -55,7 +55,7 @@ class Builder implements BuilderInterface {
     /**
      * Возвращает результат сборки
      *
-     * @param array $instruction
+     * @param string|array $instruction
      * @return mixed
      * @throws \Exception
      */
@@ -320,6 +320,7 @@ class Builder implements BuilderInterface {
      *
      * @param array $instruction
      * @return mixed
+     * @throws \Exception
      */
     protected static function makeInstruction (array $instruction) {
 

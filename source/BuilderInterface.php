@@ -20,7 +20,7 @@ interface BuilderInterface {
     /**
      * Возвращает результат сборки
      *
-     * @param array $instruction
+     * @param string|array $instruction
      * @return mixed
      */
     public static function make ($instruction);
