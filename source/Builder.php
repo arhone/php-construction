@@ -193,18 +193,18 @@ class Builder implements BuilderInterface {
 
         if (isset(self::$storage[$alias])) {
 
-            $obj = ($instruction['clone'] ?? self::$config['clone']) ? clone self::$storage[$alias] : self::$storage[$alias];
+            $object = ($instruction['clone'] ?? self::$config['clone']) ? clone self::$storage[$alias] : self::$storage[$alias];
 
         } else {
 
-            $obj = (object)$instruction['object'];
+            $object = (object)$instruction['object'];
             if (($instruction['clone'] ?? self::$config['clone']) && $alias) {
-                self::$storage[$alias] = $obj;
+                self::$storage[$alias] = $object;
             }
 
         }
 
-        return $obj;
+        return $object;
 
     }
 

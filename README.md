@@ -28,19 +28,19 @@ class Alias {
 
 }
 
-$Builder = new Builder();
+$builder = new Builder();
 
-$Builder->instruction([
+$builder->instruction([
     'Alias' => [
         'class' => 'Alias'
     ]
 ]);
 
 /**
- * @var $Alias \Alias
+ * @var $alias \Alias
  */
-$Alias = $Builder->make('Alias');
-echo $Alias->get();
+$alias = $builder->make('Alias');
+echo $alias->get();
 ```
 
 или собирать по инструкции
@@ -49,15 +49,15 @@ echo $Alias->get();
 <?php
 use arhone\construction\Builder;
 
-$Builder = new Builder();
+$builder = new Builder();
 
-$Builder->instruction([
+$builder->instruction([
     'Alias' => [
         'class' => 'ClassNameAlias'
     ]
 ]);
 
-$Obj = $Builder->make([
+$object = $builder->make([
     'class' => 'ClassName',
     'construct' => [
         ['Alias'],
@@ -87,12 +87,12 @@ $Obj = $Builder->make([
 use arhone\construction\Builder;
 include 'vendor/autoload.php';
 
-$Builder = new Builder();
+$builder = new Builder();
 ```
 Передать/дополнить инструкции можно с помощью метода "instruction"
 ```php
-$Builder->instruction(include 'config/builder/instruction1.php');
-$Builder->instruction(include 'config/builder/instruction2.php');
+$builder->instruction(include 'config/builder/instruction1.php');
+$builder->instruction(include 'config/builder/instruction2.php');
 ```
 
 Подразумевается что config/builder/instruction.php вернёт массив с инструкциями, вроде тех, что описаны выше:
@@ -188,7 +188,7 @@ class Test {
 
 }
 
-echo $Builder->make([
+echo $builder->make([
     'class' => 'Test',
     'method' => [
         'one' => [
@@ -224,7 +224,7 @@ return [
 
 ```php
 <?php
-echo $Builder->make('myFunc');
+echo $builder->make('myFunc');
 ```
 
 В случае с callback типом инструкции, Builder вернёт вам её результат.
@@ -246,8 +246,8 @@ return [
 
 ```php
 <?php
-$myFunc = $Builder->make('myFunc');
-echo $myFunc('Вася');
+$myFunction = $builder->make('myFunc');
+echo $myFunction('Вася');
 ```
 
 Обратите внимание, что вам может потребоваться кешировать настройки например в редис, в этом случае callback и callable не сработают, потому что кеш не хранит логику.
@@ -361,7 +361,7 @@ return [
 use arhone\construction\Builder;
 include 'vendor/autoload.php';
 
-$Builder = new Builder([
+$builder = new Builder([
     'new'   => false, // Создавать новый экземпляр класса или нет, если это не указано в инструкциях
     'clone' => true, // Клонировать объекты или нет, если это не указано в инструкциях
 ]);
