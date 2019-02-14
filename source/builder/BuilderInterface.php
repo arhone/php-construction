@@ -1,12 +1,12 @@
 <?php declare(strict_types = 1);
 
-namespace arhone\construction;
+namespace arhone\construction\builder;
 
 /**
  * Внедрение зависимостей
  *
  * Interface BuilderInterface
- * @package arhone\construction
+ * @package arhone\construction\builder
  * @author Алексей Арх <info@arh.one>
  */
 interface BuilderInterface {

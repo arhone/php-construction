@@ -16,7 +16,7 @@ Builder как и Service Locator можно использовать локал
 
 ```php
 <?php
-use arhone\construction\Builder;
+use arhone\construction\builder\Builder;
 
 class Alias {
 
@@ -47,7 +47,7 @@ echo $alias->get();
 
 ```php
 <?php
-use arhone\construction\Builder;
+use arhone\construction\builder\Builder;
 
 $builder = new Builder();
 
@@ -84,7 +84,7 @@ $object = $builder->make([
 2) Подключите Builder с помощью автозагрузчика
 ```php
 <?php
-use arhone\construction\Builder;
+use arhone\construction\builder\Builder;
 include 'vendor/autoload.php';
 
 $builder = new Builder();
@@ -358,7 +358,7 @@ return [
 
 ```php
 <?php
-use arhone\construction\Builder;
+use arhone\construction\builder\Builder;
 include 'vendor/autoload.php';
 
 $builder = new Builder([
